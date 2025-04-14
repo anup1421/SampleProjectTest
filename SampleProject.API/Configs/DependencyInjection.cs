@@ -8,6 +8,9 @@ using FluentValidation;
 using BuildingBlocks.Application.Behaviours;
 using MediatR;
 using Swashbuckle.AspNetCore.Filters;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace SampleProject.API.Configs;
 
@@ -19,6 +22,7 @@ public static class DependencyInjection
             .RegisterRepositories()
             .RegisterDBContext(configuration)
             .RegisterAuthentication()
+            .RegisterSecurity()
             .RegisterMediatR()
             .RegisterValidator()
             .RegisterSwagger();
@@ -74,6 +78,30 @@ public static class DependencyInjection
     private static IServiceCollection RegisterSwagger(this IServiceCollection services)
     {
         services.AddSwaggerExamplesFromAssemblyOf(typeof(SampleModelMapper));
+
+        return services;
+    }
+
+    private static IServiceCollection RegisterSecurity(this IServiceCollection services)
+    {
+        // Add global CSRF protection
+        services.AddMvc(options =>
+        {
+            options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
+        });
+
+        return services;
+        services.AddControllersWithViews(options =>
+        {
+            options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
+        });
+
+        // Configure antiforgery cookie settings
+        services.AddAntiforgery(options =>
+        {
+            options.Cookie.SameSite = SameSiteMode.Strict;
+            options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+        });
 
         return services;
     }
