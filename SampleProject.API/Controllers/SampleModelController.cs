@@ -28,6 +28,7 @@ public class SampleModelController(IMediator mediator) : BaseController
     public async Task<IActionResult> Get(int id, CancellationToken cancellationToken)
     {
         var result = await mediator.Send(new GetSampleModelByIdQuery(id), cancellationToken);
+        Console.WriteLine(result);
         return ApiResult(result);
     }
 
