@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Diagnostics.HealthChecks;
+using System.Security.Cryptography;
 
 namespace BuildingBlocks.API.Configs;
 
@@ -6,9 +7,8 @@ internal class CustomHealthCheck : IHealthCheck
 {
     public Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
     {
-        var random = new Random();
-        var expectedNumber = random.Next(60, 100);
-        var actualNumber = random.Next(0, 100);
+        var expectedNumber = RandomNumberGenerator.GetInt32(60, 100);
+        var actualNumber = RandomNumberGenerator.GetInt32(0, 100);
 
         var data = new Dictionary<string, object>
         {
